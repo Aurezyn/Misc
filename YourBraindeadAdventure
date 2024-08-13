@@ -1,0 +1,436 @@
+local function godMode()
+
+--//Settings\\--
+local WalkSpeed = 50
+
+--//Services\\--
+local RunService = game:GetService("RunService")
+
+--//Variables\\--
+local LocalPlayer = game.Players.LocalPlayer
+local Character = LocalPlayer.Character
+local Humanoid = Character:WaitForChild("Humanoid")
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+local RemoteEvent = Character:WaitForChild("RemoteEvent")
+local CurrentCamera = workspace.CurrentCamera
+
+Character.Archivable = true
+local ControlCharacter = Character:Clone()
+ControlCharacter.Parent = workspace
+ControlCharacter.PrimaryPart.CFrame = ControlCharacter.PrimaryPart.CFrame
+
+local function makeInvisible(character)
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") or part:IsA("Decal") then
+            part.Transparency = 1
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        elseif part:IsA("ParticleEmitter") or part:IsA("Trail") then
+            part.Enabled = false
+        elseif part:IsA("BillboardGui") or part:IsA("SurfaceGui") then
+            part.Enabled = false
+        end
+    end
+end
+
+local function ControlHumanoid(NPC, WalkSpeed)
+    local ControlHumanoid = NPC:FindFirstChild("Humanoid")
+    local ControlHumanoidRootPart = NPC:FindFirstChild("HumanoidRootPart")
+	ControlHumanoid.WalkSpeed = WalkSpeed
+	
+	--//Jumping\\--
+	Humanoid:GetPropertyChangedSignal("Jump"):Connect(function()
+		if not Humanoid.Jump then return end
+	    ControlHumanoid.Jump = true
+	end)
+	
+	--//WalkSpeed\\--
+	ControlHumanoid.WalkSpeed = Humanoid.WalkSpeed
+	Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+	    if Humanoid.WalkSpeed == 0 then return end
+	    ControlHumanoid.WalkSpeed = Humanoid.WalkSpeed
+	end)
+    
+    --//Walking\\--
+    RunService.Heartbeat:Connect(function()
+    	local MoveDirection = CurrentCamera.CFrame:VectorToObjectSpace(Humanoid.MoveDirection)
+    	ControlHumanoid:Move(MoveDirection, true)
+    	
+    	HumanoidRootPart.CFrame = ControlHumanoidRootPart.CFrame
+    end)
+end
+
+makeInvisible(ControlCharacter)
+ControlHumanoid(ControlCharacter, WalkSpeed)
+RemoteEvent:FireServer("Poison", {Duration = math.huge, TotalDamage = math.huge})
+end
+
+local function worthinessOne()
+game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack({
+    [1] = "LearnSkill",
+    [2] = {
+        ["Skill"] = "Worthiness I",
+        ["SkillTreeType"] = "Character"
+    }
+}))
+end
+
+local player = game.Players.LocalPlayer
+local function useArrow()
+ if not player.Backpack:FindFirstChild("Mysterious Arrow") then
+          return
+      end
+      
+      if player.PlayerStats.Stand.Value ~= "None" then
+          return
+      end
+  
+      if not player.Character then
+          return 
+      end
+  
+      if not player.Character:FindFirstChild("Mysterious Arrow") then
+          player.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild("Mysterious Arrow"))
+      end
+  
+      repeat
+          game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
+          task.wait(0.05)
+      until player.PlayerGui:FindFirstChild("DialogueGui")
+  
+      if player.PlayerGui:FindFirstChild("DialogueGui") then
+          repeat
+              game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
+              task.wait(0.05)
+          until player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
+  
+          local Eat = player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
+          repeat task.wait() until Eat.Visible
+              
+          local Dial = player.PlayerGui:FindFirstChild("DialogueGui").Frame
+              
+          self:Click(Eat.TextButton, true)
+              
+          repeat task.wait() until not Dial.Parent
+      end
+end
+
+local function characterBuild()
+game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack({
+    [1] = "LearnSkill",
+    [2] = {
+        ["Skill"] = "Agility V",
+        ["SkillTreeType"] = "Character"
+    }
+}))
+
+game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack({
+    [1] = "LearnSkill",
+    [2] = {
+        ["Skill"] = "Sturdiness I",
+        ["SkillTreeType"] = "Character"
+    }
+}))
+
+game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack({
+    [1] = "LearnSkill",
+    [2] = {
+        ["Skill"] = "Health Regen II",
+        ["SkillTreeType"] = "Character"
+    }
+}))
+
+game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack({
+    [1] = "LearnSkill",
+    [2] = {
+        ["Skill"] = "Vitality X",
+        ["SkillTreeType"] = "Character"
+    }
+}))
+end
+
+local function useRib()
+game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack({
+    [1] = "LearnSkill",
+    [2] = {
+        ["Skill"] = "Worthiness V",
+        ["SkillTreeType"] = "Character"
+    }
+}))
+game:GetService("Players").LocalPlayer.Character.RemoteEvent:FireServer(unpack({
+    [1] = "EndDialogue",
+    [2] = {
+        ["NPC"] = "Rib Cage of The Saint's Corpse",
+        ["Option"] = "Option1",
+        ["Dialogue"] = "Dialogue2"
+    }
+}))
+end
+
+getgenv().AutoArcade = false
+
+local LocalPlayer = game.Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+--coroutine.wrap(function()
+
+--end)()
+
+--//Config\\--
+getgenv().AutoFarm = false
+getgenv().PickupDelay = 0.5
+getgenv().MaxTeleportDistance = 45
+getgenv().TeleportSpeed = 6
+
+--//Script\\--
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = game.Players.LocalPlayer
+local Character = LocalPlayer.Character
+local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+
+local function TeleportToPlace(targetCFrame)
+    local startPosition = HumanoidRootPart.Position
+    local direction = (targetCFrame.Position - startPosition).unit
+    local distance = (targetCFrame.Position - startPosition).Magnitude
+
+    local GoalCFrame
+    local Loop = RunService.Heartbeat:Connect(function()
+        if not GoalCFrame then return end
+
+        for _, BasePart in pairs(Character:GetDescendants()) do
+            if BasePart:IsA("BasePart") and BasePart.CanCollide then
+                BasePart.CanCollide = false
+            end
+        end
+
+        HumanoidRootPart.CFrame = GoalCFrame
+    end)
+
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge) -- Only counteract gravity on the Y axis
+    bodyVelocity.Parent = HumanoidRootPart
+
+    while distance > getgenv().MaxTeleportDistance do
+        startPosition = startPosition + direction * getgenv().MaxTeleportDistance
+        GoalCFrame = CFrame.new(startPosition)
+        distance = (targetCFrame.Position - startPosition).Magnitude
+        task.wait(10 / (getgenv().TeleportSpeed*10) )
+    end
+
+    GoalCFrame = targetCFrame
+    task.wait()
+
+    Loop:Disconnect()
+    bodyVelocity:Destroy()
+    task.wait()
+end
+
+local function LocateItem()
+    for _, Item in pairs(workspace.Item_Spawns.Items:GetChildren()) do
+        local ItemMeshPart = Item:FindFirstChild("MeshPart")
+        local ProximityPrompt = Item:FindFirstChild("ProximityPrompt")
+
+        if not ItemMeshPart or not ProximityPrompt then continue end
+        if ProximityPrompt.MaxActivationDistance ~= 8 then continue end 
+
+        return {
+            ["ItemName"] = ProximityPrompt.ObjectText,
+            ["ProximityPrompt"] = ProximityPrompt,
+            ["CFrame"] = ItemMeshPart.CFrame,
+            ["Instance"] = Item
+        }
+    end
+end
+
+--coroutine.wrap(function()
+
+--end)()
+
+local library = loadstring(game:GetObjects("rbxassetid://7657867786")[1].Source)()
+local Wait = library.subs.Wait -- Only returns if the GUI has not been terminated. For 'while Wait() do' loops
+
+local PepsisWorld = library:CreateWindow({
+Name = "YBA Scripts",
+Themeable = {
+Info = "thoyai is poop"
+}
+})
+
+local GeneralTab = PepsisWorld:CreateTab({
+Name = "General"
+})
+
+local FarmingSection = GeneralTab:CreateSection({
+Name = "Farming"
+})
+
+FarmingSection:AddButton({
+Name = "Worthiness 5 + Rib",
+Callback = function()
+useRib()
+end
+})
+
+FarmingSection:AddButton({
+Name = "Worthiness 1 + Arrow",
+Callback = function()
+worthinessOne()
+useArrow()
+end
+})
+
+FarmingSection:AddToggle({
+Name = "Auto Arcade",
+Flag = "Arcade",
+Callback = function(bool)
+print(bool)
+getgenv().AutoArcade = bool
+while getgenv().AutoArcade do
+    task.wait()
+
+    local RollingGUI = PlayerGui:FindFirstChild("RollingItem")
+    if RollingGUI then RollingGUI.Enabled = false; continue end
+
+    Character.RemoteEvent:FireServer("EndDialogue", {["Option"] = "Option1",["Dialogue"] = "Dialogue1",["NPC"] = "Item Machine"})
+end
+end
+})
+
+FarmingSection:AddToggle({
+Name = "Auto Item Farm",
+Flag = "Item",
+Callback = function(bool)
+print(bool)
+getgenv().AutoFarm = bool
+while getgenv().AutoFarm do
+    task.wait()
+
+    local TargetItem = LocateItem()
+    if not TargetItem then TeleportToPlace(CFrame.new(math.random(-1000, 1000), 0, math.random(-1000, 1000))); continue end
+
+    --//Pickup Item\\--
+    TeleportToPlace(TargetItem.CFrame)
+
+    if (HumanoidRootPart.Position - TargetItem.CFrame.Position).Magnitude <= 8 then
+        task.wait(getgenv().PickupDelay)
+        fireproximityprompt(TargetItem.ProximityPrompt)
+        task.wait(getgenv().PickupDelay)
+        TargetItem.Instance:Destroy()
+    end
+end
+end
+})
+
+local MiscSection = GeneralTab:CreateSection({
+Name = "Misc"
+})
+MiscSection:AddButton({
+Name = "Godmode (reset to cancel)",
+Callback = function()
+godMode()
+end
+})
+
+MiscSection:AddButton({
+Name = "Basic Skill Tree Build",
+Callback = function()
+characterBuild()
+end
+})
+
+MiscSection:AddButton({
+Name = "Talk to Jesus",
+Callback = function()
+game:GetService("Players").LocalPlayer.Character.RemoteEvent:FireServer("PromptTriggered", game:GetService("ReplicatedStorage").NewDialogue.Jesus)
+end
+})
+
+MiscSection:AddButton({
+Name = "Inf Yield (ESP ONLY)",
+Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+end
+})
+
+--//Config\\--
+local InvisibilityKey = Enum.KeyCode.Z
+
+--//Services\\--
+local UserInputService = game:GetService("UserInputService")
+local PlayerService = game:GetService("Players")
+
+--//Variables\\--
+local LocalPlayer = PlayerService.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local PlayerGui = LocalPlayer:FindFirstChild("PlayerGui")
+
+local UndergroundAnimation, Highlight
+function PlayAnimation(HumanoidCharacter, AnimationID, AnimationSpeed, Time)
+	local CreatedAnimation = Instance.new("Animation")
+	CreatedAnimation.AnimationId = AnimationID
+    local animationTrack = HumanoidCharacter:FindFirstChildOfClass("Humanoid"):FindFirstChildOfClass("Animator"):LoadAnimation(CreatedAnimation)
+
+	animationTrack:Play()
+	animationTrack:AdjustSpeed(AnimationSpeed)
+	animationTrack.Priority= Enum.AnimationPriority.Action4
+	animationTrack.TimePosition = Time
+	return animationTrack
+end
+
+local function Invisibile()
+    local HUD = PlayerGui:FindFirstChild("HUD")
+    HUD.Parent = nil
+
+    --//As Simple As That Gang\\--
+    UndergroundAnimation = PlayAnimation(Character, "rbxassetid://7189062263", 0, 5)
+    LocalPlayer.Character = nil
+
+    UndergroundAnimation:Stop()
+    LocalPlayer.Character = Character
+
+    HUD.Parent = PlayerGui
+
+    Highlight = Instance.new("Highlight")
+    Highlight.Parent = Character
+    Highlight.Enabled = true
+end
+
+local function Uninvisible()
+    --//As Simple As That Gang\\--
+    PlayAnimation(Character, "rbxassetid://7189062263", 0, 5):Stop()
+    Highlight:Destroy()
+end
+print(1)
+
+local IsInvisibile
+MiscSection:AddToggle({
+Name = "Invisible",
+Flag = "Invis",
+Callback = function(bool)
+print(bool)
+if IsInvisibile then
+        Uninvisible()
+    else
+        Invisibile()
+    end
+
+    IsInvisibile = not IsInvisibile
+end
+})
+print(2)
+--//Bypasses\\--
+
+
+
+local TPBypass
+TPBypass = hookfunction(getrawmetatable(game).__namecall, newcclosure(function(self, ...)
+  local args = {...}
+  if self.Name == "Returner" and args[1] == "idklolbrah2de"  then
+          return "  ___XP DE KEY"
+      end
+  return TPBypass(self, ...)
+end))
