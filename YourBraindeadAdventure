@@ -278,6 +278,16 @@ local function TeleportToPlace(targetCFrame)
     task.wait()
 end
 
+local function numItems(itemList, itemName)
+local count = 0
+for i,v in itemList do
+   if v == itemName then
+       count = count + 1
+   end
+end
+return count
+end
+
 local function LocateItem()
     for _, Item in pairs(workspace.Item_Spawns.Items:GetChildren()) do
         local ItemMeshPart = Item:FindFirstChild("MeshPart")
@@ -286,8 +296,27 @@ local function LocateItem()
         if not ItemMeshPart or not ProximityPrompt then continue end
         if ProximityPrompt.MaxActivationDistance ~= 8 then continue end 
 
+        local itemName = ProximityPrompt.ObjectText
+
+local itemList = {}
+for _, item in player.Backpack:GetChildren() do
+    table.insert(itemList, item.Name)
+end
+
+        if itemName == "Gold Coin" and numItems(itemList, "Gold Coin") == 45 then continue end
+        if itemName == "Diamond" and numItems(itemList, "Diamond") == 30 then continue end
+        if itemName == "Mysterious Arrow" and numItems(itemList, "Mysterious Arrow") == 25 then continue end
+        if itemName == "Rokakaka" and numItems(itemList, "Rokakaka") == 25 then continue end
+        if itemName == "Rib Cage of the Saint's Corpse" and numItems(itemList, "Rib Cage of the Saint's Corpse") == 10 then continue end
+        if itemName == "Zepellin's Headband" and numItems(itemList, "Zepellin's Headband") == 10 then continue end
+        if itemName == "Quinton's Glove" and numItems(itemList, "Quinton's Glove") == 10 then continue end
+        if itemName == "Stone Mask" and numItems(itemList, "Stone Mask") == 10 then continue end
+        if itemName == "Steel Ball" and numItems(itemList, "Steel Ball") == 10 then continue end
+        if itemName == "Ancient Scroll" and numItems(itemList, "Ancient Scroll") == 10 then continue end
+        if itemName == "Dio's Diary" and numItems(itemList, "Dio's Diary") == 10 then continue end
+
         return {
-            ["ItemName"] = ProximityPrompt.ObjectText,
+            ["ItemName"] = itemName,
             ["ProximityPrompt"] = ProximityPrompt,
             ["CFrame"] = ItemMeshPart.CFrame,
             ["Instance"] = Item
@@ -366,7 +395,8 @@ while getgenv().AutoFarm do
     task.wait()
 
     local TargetItem = LocateItem()
-    if not TargetItem then TeleportToPlace(CFrame.new(math.random(-1000, 1000), 0, math.random(-1000, 1000))); continue end
+   if not TargetItem then TeleportToPlace(CFrame.new(math.random(-1000, 1000), 0, math.random(-1000, 1000))); continue end
+--if TargetItem then
 
     --//Pickup Item\\--
     TeleportToPlace(TargetItem.CFrame)
@@ -377,6 +407,7 @@ while getgenv().AutoFarm do
         task.wait(getgenv().PickupDelay)
         TargetItem.Instance:Destroy()
     end
+--end
 end
 end
 })
