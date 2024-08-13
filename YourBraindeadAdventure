@@ -229,9 +229,12 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 --//Config\\--
 getgenv().AutoFarm = false
+getgenv().AutoSell = false
 getgenv().PickupDelay = 0.5
 getgenv().MaxTeleportDistance = 45
 getgenv().TeleportSpeed = 6
+
+local ItemsToSell = {}
 
 --//Script\\--
 local RunService = game:GetService("RunService")
@@ -288,6 +291,30 @@ end
 return count
 end
 
+local function backpackList()
+    local poolist = {}
+    for _, item in player.Backpack:GetChildren() do
+        table.insert(poolist, item.Name)
+    end
+    return poolist
+end
+
+local MaxCount = {
+          ["Diamond"] = 30,
+          ["Gold Coin"] = 45,
+          ["Mysterious Arrow"] = 25,
+          ["Pure Rokakaka"] = 10,
+          ["Rokakaka"] = 25,
+          ["Stone Mask"] = 10,
+          ["Rib Cage of The Saint's Corpse"] = 10,
+          ["Steel Ball"] = 10,
+          ["Ancient Scroll"] = 10,
+          ["Dio's Diary"] = 10,
+          ["Zepellin's Headband"] = 10,
+          ["Quinton's Glove"] = 10,
+          ["Lucky Arrow"] = 10
+      }
+
 local function LocateItem()
     for _, Item in pairs(workspace.Item_Spawns.Items:GetChildren()) do
         local ItemMeshPart = Item:FindFirstChild("MeshPart")
@@ -297,23 +324,8 @@ local function LocateItem()
         if ProximityPrompt.MaxActivationDistance ~= 8 then continue end 
 
         local itemName = ProximityPrompt.ObjectText
-
-local itemList = {}
-for _, item in player.Backpack:GetChildren() do
-    table.insert(itemList, item.Name)
-end
-
-        if itemName == "Gold Coin" and numItems(itemList, "Gold Coin") == 45 then continue end
-        if itemName == "Diamond" and numItems(itemList, "Diamond") == 30 then continue end
-        if itemName == "Mysterious Arrow" and numItems(itemList, "Mysterious Arrow") == 25 then continue end
-        if itemName == "Rokakaka" and numItems(itemList, "Rokakaka") == 25 then continue end
-        if itemName == "Rib Cage of the Saint's Corpse" and numItems(itemList, "Rib Cage of the Saint's Corpse") == 10 then continue end
-        if itemName == "Zepellin's Headband" and numItems(itemList, "Zepellin's Headband") == 10 then continue end
-        if itemName == "Quinton's Glove" and numItems(itemList, "Quinton's Glove") == 10 then continue end
-        if itemName == "Stone Mask" and numItems(itemList, "Stone Mask") == 10 then continue end
-        if itemName == "Steel Ball" and numItems(itemList, "Steel Ball") == 10 then continue end
-        if itemName == "Ancient Scroll" and numItems(itemList, "Ancient Scroll") == 10 then continue end
-        if itemName == "Dio's Diary" and numItems(itemList, "Dio's Diary") == 10 then continue end
+        local found = table.find(ItemsToSell, itemName)
+        if numItems(backpackList(), itemName) == MaxCount[itemName] and not found then continue end
 
         return {
             ["ItemName"] = itemName,
@@ -346,6 +358,10 @@ local FarmingSection = GeneralTab:CreateSection({
 Name = "Farming"
 })
 
+local SellSection = GeneralTab:CreateSection({
+Name = "Auto Sell"
+})
+
 FarmingSection:AddButton({
 Name = "Worthiness 5 + Rib",
 Callback = function()
@@ -372,7 +388,6 @@ FarmingSection:AddToggle({
 Name = "Auto Arcade",
 Flag = "Arcade",
 Callback = function(bool)
-print(bool)
 getgenv().AutoArcade = bool
 while getgenv().AutoArcade do
     task.wait()
@@ -389,7 +404,6 @@ FarmingSection:AddToggle({
 Name = "Auto Item Farm",
 Flag = "Item",
 Callback = function(bool)
-print(bool)
 getgenv().AutoFarm = bool
 while getgenv().AutoFarm do
     task.wait()
@@ -405,6 +419,20 @@ while getgenv().AutoFarm do
         task.wait(getgenv().PickupDelay)
         fireproximityprompt(TargetItem.ProximityPrompt)
         task.wait(getgenv().PickupDelay)
+        if table.find(ItemsToSell, TargetItem.ItemName) then
+            print("balls1")
+            print(numItems(backpackList(), TargetItem.ItemName))
+            print(MaxCount[TargetItem.ItemName])
+            if numItems(backpackList(), TargetItem.ItemName) == MaxCount[TargetItem.ItemName] then
+                print("balls2")
+                print(getgenv().AutoSell)
+                if getgenv().AutoSell then
+                    print(TargetItem.ItemName)
+                    player.Character.Humanoid:EquipTool(player.Backpack:FindFirstChild(TargetItem.ItemName))
+                    player.Character.RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option2", Dialogue = "Dialogue5"})
+                end
+            end
+        end
         TargetItem.Instance:Destroy()
     end
 --end
@@ -442,6 +470,50 @@ Callback = function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 end
 })
+
+SellSection:AddButton({
+Name = "Sell All (Hold item)",
+Callback = function()
+player.Character.RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option2", Dialogue = "Dialogue5"})
+end
+})
+SellSection:AddButton({
+Name = "Sell One (Hold item)",
+Callback = function()
+player.Character.RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option1", Dialogue = "Dialogue5"})
+end
+})
+
+SellSection:AddButton({
+Name = "Sell All But One (Hold item)",
+Callback = function()
+    local itemHeld = player.Character:FindFirstChildOfClass("Tool").Name
+    for i = 1, numItems(backpackList(), itemHeld) do
+        player.Character.RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option1", Dialogue = "Dialogue5"})
+        player.Character.Humanoid:EquipTool(player.Backpack:FindFirstChild(itemHeld))
+        task.wait(1)
+    end
+end
+})
+
+SellSection:AddToggle({
+Name = "Auto Sell",
+Callback = function(bool)
+getgenv().AutoSell = bool
+end
+})
+for i, v in pairs(MaxCount) do
+    SellSection:AddToggle({
+        Name = i,
+        Callback = function(bool)
+            if bool then
+                table.insert(ItemsToSell, i)
+            else
+                table.remove(ItemsToSell, table.find(ItemsToSell, i))
+            end
+        end,
+    })
+end
 
 --//Config\\--
 local InvisibilityKey = Enum.KeyCode.Z
@@ -491,14 +563,12 @@ local function Uninvisible()
     PlayAnimation(Character, "rbxassetid://7189062263", 0, 5):Stop()
     Highlight:Destroy()
 end
-print(1)
 
 local IsInvisibile
 MiscSection:AddToggle({
 Name = "Invisible",
 Flag = "Invis",
 Callback = function(bool)
-print(bool)
 if IsInvisibile then
         Uninvisible()
     else
@@ -508,7 +578,6 @@ if IsInvisibile then
     IsInvisibile = not IsInvisibile
 end
 })
-print(2)
 --//Bypasses\\--
 
 
