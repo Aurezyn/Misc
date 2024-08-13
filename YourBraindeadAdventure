@@ -1,3 +1,14 @@
+local function Click(Button, Manual)
+      for i, v in pairs(getconnections(Button.MouseButton1Click)) do
+          if Manual then
+              v.Function()
+          else
+              v:Fire()
+          end
+      end
+  end
+
+
 local function godMode()
 
 --//Settings\\--
@@ -110,10 +121,48 @@ local function useArrow()
               
           local Dial = player.PlayerGui:FindFirstChild("DialogueGui").Frame
               
-          self:Click(Eat.TextButton, true)
+          --Click(Button, Manual)(Eat.TextButton, true)
               
           repeat task.wait() until not Dial.Parent
       end
+end
+
+local function useRoka()
+      if not player.Backpack:FindFirstChild("Rokakaka") then
+          return
+      end
+      
+      if player.PlayerStats.Stand.Value == "None" then
+          return
+      end
+  
+      if not player.Character then
+          return 
+      end
+  
+      if not player.Character:FindFirstChild("Rokakaka") then
+          player.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild("Rokakaka"))
+      end
+      
+      repeat
+          game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
+          task.wait(0.05)
+      until player.PlayerGui:FindFirstChild("DialogueGui")
+      
+      if player.PlayerGui:FindFirstChild("DialogueGui") then
+          repeat
+              game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
+              task.wait(0.05)
+          until player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
+          
+          local Eat = player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
+          repeat task.wait() until Eat.Visible
+              
+          local Dial = player.PlayerGui:FindFirstChild("DialogueGui").Frame
+              
+          --Click(Button, Manual)(Eat.TextButton, true)
+              
+          repeat task.wait() until not Dial.Parent end
 end
 
 local function characterBuild()
@@ -280,6 +329,13 @@ Name = "Worthiness 1 + Arrow",
 Callback = function()
 worthinessOne()
 useArrow()
+end
+})
+
+FarmingSection:AddButton({
+Name = "Use Roka",
+Callback = function()
+useRoka()
 end
 })
 
