@@ -89,44 +89,43 @@ end
 
 local player = game.Players.LocalPlayer
 local function useArrow()
- if not player.Backpack:FindFirstChild("Mysterious Arrow") then
-          return
-      end
+    if not player.Backpack:FindFirstChild("Mysterious Arrow") then
+        return
+    end
       
-      if player.PlayerStats.Stand.Value ~= "None" then
-          return
-      end
+    if player.PlayerStats.Stand.Value ~= "None" then
+        return
+    end
   
-      if not player.Character then
-          return 
-      end
+    if not player.Character then
+        return 
+    end
   
-      if not player.Character:FindFirstChild("Mysterious Arrow") then
-          player.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild("Mysterious Arrow"))
-      end
+    if not player.Character:FindFirstChild("Mysterious Arrow") then
+        player.Character.Humanoid:EquipTool(game.Players.LocalPlayer.Backpack:FindFirstChild("Mysterious Arrow"))
+    end
   
-      repeat
-          game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
-          task.wait(0.05)
-      until player.PlayerGui:FindFirstChild("DialogueGui")
+    repeat
+        game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
+        task.wait(0.05)
+    until player.PlayerGui:FindFirstChild("DialogueGui")
   
-      if player.PlayerGui:FindFirstChild("DialogueGui") then
-          repeat
-              game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
-              task.wait(0.05)
-          until player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
+    if player.PlayerGui:FindFirstChild("DialogueGui") then
+        repeat
+            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0,8,0, true, nil, 1)
+            task.wait(0.05)
+        until player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
   
-          local Eat = player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
-          repeat task.wait() until Eat.Visible
+        local Eat = player.PlayerGui:FindFirstChild("DialogueGui").Frame.Options:FindFirstChild("Option1")
+        repeat task.wait() until Eat.Visible
               
-          local Dial = player.PlayerGui:FindFirstChild("DialogueGui").Frame
+        local Dial = player.PlayerGui:FindFirstChild("DialogueGui").Frame
               
-          --Click(Button, Manual)(Eat.TextButton, true)
+        --Click(Button, Manual)(Eat.TextButton, true)
               
-          repeat task.wait() until not Dial.Parent
-      end
+        repeat task.wait() until not Dial.Parent
+    end
 end
-
 local function useRoka()
       if not player.Backpack:FindFirstChild("Rokakaka") then
           return
@@ -200,6 +199,17 @@ game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unp
 end
 
 local function useRib()
+if not player.Backpack:FindFirstChild("Mysterious Arrow") then
+    return
+end
+      
+if player.PlayerStats.Stand.Value ~= "None" then
+    return
+end
+  
+if not player.Character then
+    return 
+end
 game:GetService("Players").LocalPlayer.Character.RemoteFunction:InvokeServer(unpack({
     [1] = "LearnSkill",
     [2] = {
@@ -232,7 +242,7 @@ getgenv().AutoFarm = false
 getgenv().AutoSell = false
 getgenv().PickupDelay = 0.9
 getgenv().MaxTeleportDistance = 45
-getgenv().TeleportSpeed = 6
+getgenv().TeleportSpeed = 4
 
 local ItemsToSell = {}
 
@@ -270,7 +280,7 @@ local function TeleportToPlace(targetCFrame)
         startPosition = startPosition + direction * getgenv().MaxTeleportDistance
         GoalCFrame = CFrame.new(startPosition)
         distance = (targetCFrame.Position - startPosition).Magnitude
-        task.wait(10 / (getgenv().TeleportSpeed*10) )
+        task.wait(1 / getgenv().TeleportSpeed)
     end
 
     GoalCFrame = targetCFrame
@@ -324,7 +334,6 @@ local function LocateItem()
         if ProximityPrompt.MaxActivationDistance ~= 8 then continue end 
 
         local itemName = ProximityPrompt.ObjectText
-        if numItems(backpackList(), itemName) == MaxCount[itemName] then continue end
 
         return {
             ["ItemName"] = itemName,
@@ -334,10 +343,6 @@ local function LocateItem()
         }
     end
 end
-
---coroutine.wrap(function()
-
---end)()
 
 local library = loadstring(game:GetObjects("rbxassetid://7657867786")[1].Source)()
 local Wait = library.subs.Wait -- Only returns if the GUI has not been terminated. For 'while Wait() do' loops
@@ -356,15 +361,44 @@ Name = "General"
 local FarmingSection = GeneralTab:CreateSection({
 Name = "Farming"
 })
+local PlayerSection = GeneralTab:CreateSection({
+Name = "Player Stats"
+})
+
+local standLabel = PlayerSection:AddLabel({
+    Text = "Current Stand: " .. player.PlayerStats.Stand.Value
+})
+
+local pityLabel = PlayerSection:AddLabel({
+    Text = "Current Pity: " .. player.PlayerStats.PityCount.Value*4+100
+})
 
 local SellSection = GeneralTab:CreateSection({
-Name = "Auto Sell"
+Name = "Auto Sell",
+Side = "Right"
 })
 
 FarmingSection:AddButton({
 Name = "Worthiness 5 + Rib",
 Callback = function()
 useRib()
+repeat task.wait() until player.PlayerStats.Stand.Value ~= "None"
+local Skin
+if Character and Character:FindFirstChild("RemoteFunction") then
+    Skin = Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand")
+end
+if not(Skin == "None" or Skin == nil) then
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "You got a skin:",
+        Text = Skin,
+            Duration = 10
+        })
+    else
+        -- no skin
+    end
+
+standLabel:Set("Current Stand: " .. player.PlayerStats.Stand.Value)
+pityLabel:Set("Current Pity: " .. player.PlayerStats.PityCount.Value*4+100)
 end
 })
 
@@ -373,6 +407,23 @@ Name = "Worthiness 1 + Arrow",
 Callback = function()
 worthinessOne()
 useArrow()
+repeat task.wait() until player.PlayerStats.Stand.Value ~= "None"
+local Skin
+if Character and Character:FindFirstChild("RemoteFunction") then
+    Skin = Character.RemoteFunction:InvokeServer("ReturnStandSkin", "Stand")
+end
+if not(Skin == "None" or Skin == nil) then
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "You got a skin:",
+        Text = Skin,
+            Duration = 10
+        })
+    else
+        -- no skin
+    end
+
+standLabel:Set("Current Stand: " .. player.PlayerStats.Stand.Value)
+pityLabel:Set("Current Pity: " .. player.PlayerStats.PityCount.Value*4+100)
 end
 })
 
@@ -422,13 +473,12 @@ while getgenv().AutoFarm do
         local ping = game.Players.LocalPlayer:GetNetworkPing()
         if ping * 1000 >= 3000 then return end
         -- Check Auto Sell
-        if table.find(ItemsToSell, TargetItem.ItemName) then
-            if numItems(backpackList(), TargetItem.ItemName) >= MaxCount[TargetItem.ItemName] - 1 then
-                if getgenv().AutoSell then
-                    player.Character.Humanoid:EquipTool(player.Backpack:FindFirstChild(TargetItem.ItemName))
-                    player.Character.RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option2", Dialogue = "Dialogue5"})
-                end
-            end
+        if numItems(backpackList(), TargetItem.ItemName) >= MaxCount[TargetItem.ItemName] - 1 then
+            player.Character.Humanoid:EquipTool(player.Backpack:FindFirstChild(TargetItem.ItemName))
+			player.Character.RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option1", Dialogue = "Dialogue5"})
+		elseif getgenv().AutoSell and table.find(ItemsToSell, TargetItem.ItemName) then
+			player.Character.Humanoid:EquipTool(player.Backpack:FindFirstChild(TargetItem.ItemName))
+			player.Character.RemoteEvent:FireServer("EndDialogue", {NPC = "Merchant", Option = "Option2", Dialogue = "Dialogue5"})
         end
         task.wait(getgenv().PickupDelay + ping)
         fireproximityprompt(TargetItem.ProximityPrompt)
@@ -514,6 +564,8 @@ for i, v in pairs(MaxCount) do
         end,
     })
 end
+
+-- invisibility
 
 --//Config\\--
 local InvisibilityKey = Enum.KeyCode.Z
